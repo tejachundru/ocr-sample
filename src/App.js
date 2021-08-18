@@ -21,7 +21,6 @@ const getHostUrl = () => {
 
 function App() {
   const webcamRef = useRef(null);
-  const [imgSrc, setImgSrc] = useState(null);
   const [textOcr, setTextOcr] = useState(null);
   const [load, setLoad] = useState(false);
   let fileInputRef = createRef();
@@ -42,13 +41,12 @@ function App() {
       .then((res) => {
         console.log(res.data);
         setTextOcr(res.data.text);
-        setImgSrc(imageSrc);
         setLoad(false);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [webcamRef, setImgSrc]);
+  }, [webcamRef]);
 
   const upload = (file) => {
     setLoad(true);
@@ -59,44 +57,44 @@ function App() {
       headers: { "Content-Type": "multipart/form-data" },
     };
     return axios.post(url, formData, config).then((res) => {
+      console.log("this the result", res);
       console.log(res.data);
       setTextOcr(res.data.text);
-      setImgSrc(res.data.image);
       setLoad(false);
     });
+  };
+
+  const videoConstraints = {
+    facingMode: "environment",
   };
 
   return (
     <>
       <center>
-        <Header
-          style={{ margin: 40, fontSize: 50, fontFamily: "roboto" }}
-          size="huge"
-        >
-          React OCR
+        <Header style={{ margin: 40 }} size="medium">
+          Please Capture your image using the camera or Upload your Image
         </Header>
       </center>
-
-      <Grid divided>
-        <Grid.Column style={{ width: "50%" }} key={0}>
+      <Grid divided centered>
+        <Grid.Row style={{ width: "50%" }} key={0}>
           <center>
             <Webcam
               audio={false}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
+              videoConstraints={videoConstraints}
               onUserMediaError={(err) =>
                 console.log("this the error in the termonal", err)
               }
             />
-            <Grid.Column>
+            <Grid.Row>
               <Button
                 size="big"
                 onClick={capture}
                 style={{ margin: 20 }}
                 icon
                 labelPosition="left"
-                inverted
-                color="green"
+                color="blue"
               >
                 <Icon name="camera" />
                 Capture
@@ -109,7 +107,7 @@ function App() {
                 icon
                 labelPosition="left"
                 inverted
-                color="blue"
+                color="green"
               >
                 <Icon name="upload" />
                 Upload
@@ -126,11 +124,10 @@ function App() {
                   />
                 </form>
               </Button>
-            </Grid.Column>
+            </Grid.Row>
           </center>
-        </Grid.Column>
-
-        <Grid.Column style={{ width: "50%" }} key={1}>
+        </Grid.Row>
+        <Grid.Column style={{ width: "100%" }} key={1}>
           {load ? (
             <Loader
               style={{ marginTop: 120 }}
@@ -140,28 +137,15 @@ function App() {
             >
               Loading...
             </Loader>
-          ) : imgSrc ? (
+          ) : (
             <>
-              <Header style={{ margin: 10, fontFamily: "roboto" }} size="large">
-                Result
-              </Header>
-              <img
-                style={{ marginLeft: 10, height: "50%" }}
-                alt="captured"
-                src={imgSrc}
-              />
               <Message
-                size="massive"
-                color="orange"
-                header={textOcr}
-                content=""
+                size="big"
+                color="blue"
+                content={textOcr}
                 style={{ margin: 15 }}
               />
             </>
-          ) : (
-            <Header style={{ margin: 10, fontFamily: "roboto" }} size="large">
-              No data preview
-            </Header>
           )}
         </Grid.Column>
       </Grid>
