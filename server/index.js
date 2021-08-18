@@ -46,11 +46,41 @@ const capturedImage = async (req, res, next) => {
       res.send({
         text: text,
       });
+      appendJsonFile(text);
     });
   } catch (e) {
     next(e);
   }
 };
+
+const appendJsonFile = (text) => {
+  fs.readFile(
+    __dirname + "/img/texts.json",
+    "utf8",
+    function readFileCallback(err, data) {
+      if (err) {
+        console.log(err);
+      } else {
+        let obj = { table: [] };
+        obj = data ? JSON.parse(data) : obj; //now it an object
+        obj.table.push(text); //add some data
+        let json = JSON.stringify(obj); //convert it back to json
+        fs.writeFile(__dirname + "/img/texts.json", json, "utf8", () => {}); // write it back
+      }
+    }
+  );
+};
+
+app.get("/getJsonData", function (req, res, next) {
+  var fileName = "texts.json";
+  res.sendFile(fileName, { root: __dirname + "/img" }, function (err) {
+    if (err) {
+      next(err);
+    } else {
+      // console.log("Sent:", fileName);
+    }
+  });
+});
 
 app.post("/capture", capturedImage);
 
@@ -59,8 +89,6 @@ app.post("/upload", (req, res) => {
     let imageFile = req.files.file;
     let imgFilename = imageFile.name;
     const path = __dirname + "/img/";
-    console.log("this is the data", imageFile);
-    console.log("start 1");
 
     imageFile.mv(path + imgFilename, (err) => {
       if (err) {
@@ -71,6 +99,7 @@ app.post("/upload", (req, res) => {
           res.send({
             text: text,
           });
+          appendJsonFile(text);
           fs.unlink(`${path}/${imgFilename}`, () => {});
         });
       }
