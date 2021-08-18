@@ -12,8 +12,31 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/img", express.static("storage"));
 
 app.get("/", (req, res) => {
-  res.send("<h1>Node.js OCR</h1>");
+  res.send("<h1>OCR</h1>");
 });
+
+const recognize = (imgPath, callback) => {
+  const { createWorker } = Tesseract;
+  const path = require("path");
+
+  const worker = createWorker({
+    langPath: path.join(__dirname, "", "lang-data"),
+    logger: (m) => console.log(m),
+  });
+
+  (async () => {
+    await worker.load();
+    await worker.loadLanguage("eng");
+    await worker.initialize("eng");
+    const {
+      data: { text },
+    } = await worker.recognize(imgPath);
+
+    console.log(text);
+    callback(text);
+    await worker.terminate();
+  })();
+};
 
 const capturedImage = async (req, res, next) => {
   try {
@@ -24,9 +47,7 @@ const capturedImage = async (req, res, next) => {
     fs.writeFileSync(path, base64Data, { encoding: "base64" }); // write img file
 
     console.log("this is the data", path);
-    Tesseract.recognize(path, "eng", {
-      logger: (m) => console.log(m),
-    }).then(({ data: { text } }) => {
+    recognize(path, (text) => {
       return res.send({
         image: imgdata,
         path: path,
@@ -42,11 +63,9 @@ app.post("/capture", capturedImage);
 
 app.post("/upload", (req, res) => {
   if (req.files) {
-    console.log("&&&&&&&&&&&&&&&&&&", req.files);
     let unggahFile = req.files.file;
     let namaFile = unggahFile.name;
     const path = __dirname + "/img/";
-    console.log("&&&&&&&&&&&&&&&&&& 2", path);
 
     unggahFile.mv(path + namaFile, (err) => {
       if (err) {
@@ -61,14 +80,17 @@ app.post("/upload", (req, res) => {
           .then(({ data: { text } }) => {
             console.log(text);
             return res.send({
-              image: `http://localhost:3001/img/${namaFile}`,
-              path: `http://localhost:3001/img/${namaFile}`,
               text: text,
             });
           })
           .catch((err) => {
             console.log(err);
           });
+        recognize(`${path}/${namaFile}`, (text) => {
+          return res.send({
+            text: text,
+          });
+        });
       }
     });
   }

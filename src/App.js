@@ -4,6 +4,21 @@ import Webcam from "react-webcam";
 import axios from "axios";
 import { Header, Grid, Button, Icon, Message, Loader } from "semantic-ui-react";
 
+const getHostUrl = () => {
+  try {
+    let host = window.location.hostname;
+    let protocol = "";
+    if (host && host.includes("localhost")) {
+      protocol = "http";
+    } else {
+      protocol = "http";
+    }
+    return protocol + "://" + host + ":3001";
+  } catch (e) {
+    throw e;
+  }
+};
+
 function App() {
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
@@ -14,8 +29,8 @@ function App() {
   const capture = useCallback(() => {
     setLoad(true);
     const imageSrc = webcamRef.current.getScreenshot();
-    // console.log(imageSrc)
-    let url = "http://localhost:3001/capture";
+    console.log(imageSrc);
+    let url = `${getHostUrl()}/capture`;
     let config = {
       headers: { "Content-Type": "application/json" }, // x-www-form-urlencoded
     };
@@ -37,7 +52,7 @@ function App() {
 
   const upload = (file) => {
     setLoad(true);
-    var url = "http://localhost:3001/upload";
+    var url = `${getHostUrl()}/upload`;
     var formData = new FormData();
     formData.append("file", file);
     var config = {
@@ -69,6 +84,9 @@ function App() {
               audio={false}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
+              onUserMediaError={(err) =>
+                console.log("this the error in the termonal", err)
+              }
             />
             <Grid.Column>
               <Button
