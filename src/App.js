@@ -28,7 +28,6 @@ function App() {
   const capture = useCallback(() => {
     setLoad(true);
     const imageSrc = webcamRef.current.getScreenshot();
-    console.log(imageSrc);
     let url = `${getHostUrl()}/capture`;
     let config = {
       headers: { "Content-Type": "application/json" }, // x-www-form-urlencoded
@@ -39,7 +38,6 @@ function App() {
     axios
       .post(url, dataBody, config)
       .then((res) => {
-        console.log(res.data);
         setTextOcr(res.data.text);
         setLoad(false);
       })
@@ -50,15 +48,17 @@ function App() {
 
   const upload = (file) => {
     setLoad(true);
-    var url = `${getHostUrl()}/upload`;
-    var formData = new FormData();
+    let url = `${getHostUrl()}/upload`;
+    let formData = new FormData();
     formData.append("file", file);
-    var config = {
+    let config = {
       headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (event) => {
+        const percentCompleted = Math.round((event.loaded * 100) / event.total);
+        console.log("onUploadProgress", percentCompleted);
+      },
     };
     return axios.post(url, formData, config).then((res) => {
-      console.log("this the result", res);
-      console.log(res.data);
       setTextOcr(res.data.text);
       setLoad(false);
     });
@@ -78,18 +78,21 @@ function App() {
       <Grid divided centered>
         <Grid.Row style={{ width: "50%" }} key={0}>
           <center>
-            <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={videoConstraints}
-              onUserMediaError={(err) =>
-                console.log("this the error in the termonal", err)
-              }
-            />
+            <Grid.Row style={{ width: "90%" }} key={0}>
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                style={{ width: "100%" }}
+                screenshotFormat="image/jpeg"
+                videoConstraints={videoConstraints}
+                onUserMediaError={(err) =>
+                  console.log("this the error in the termonal", err)
+                }
+              />
+            </Grid.Row>
             <Grid.Row>
               <Button
-                size="big"
+                size="small"
                 onClick={capture}
                 style={{ margin: 20 }}
                 icon
@@ -101,7 +104,7 @@ function App() {
               </Button>
 
               <Button
-                size="big"
+                size="small"
                 onClick={() => fileInputRef.current.click()}
                 style={{ margin: 20 }}
                 icon
@@ -140,8 +143,8 @@ function App() {
           ) : (
             <>
               <Message
-                size="big"
-                color="blue"
+                size="small"
+                header={"RECOGNIZED TEXT :"}
                 content={textOcr}
                 style={{ margin: 15 }}
               />

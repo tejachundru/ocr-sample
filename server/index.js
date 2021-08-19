@@ -9,7 +9,6 @@ app.use(cors());
 app.use(upload());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use("/img", express.static("storage"));
 
 app.get("/", (req, res) => {
   res.send("<h1>OCR</h1>");
@@ -71,7 +70,7 @@ const appendJsonFile = (text) => {
   );
 };
 
-app.get("/getJsonData", function (req, res, next) {
+app.get("/getTextData", function (req, res, next) {
   var fileName = "texts.json";
   res.sendFile(fileName, { root: __dirname + "/img" }, function (err) {
     if (err) {

@@ -1,1 +1,1 @@
-{"table":["e ]\n7R 2\n","b\n2k\nI\ni. Clearing State of - if any persistent data left on background kill\nii. For now doing only for Audio book which is only effecting\nParams: resetAudioBookState ( From audio book slice)\nExpectation: Clears in audio book redux state on app launch\nsty\n.dispatch(resetAudioBookState({}));\n.dispatch(resetCourseState({}));\n/*\nSend the foregaround background Information to the Firebase\n*/\nAR\nthis.sendDataToFirebase();\n) N T A A Y\n"]}
+{ "table": [""] }
