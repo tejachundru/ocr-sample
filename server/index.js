@@ -3,6 +3,7 @@ let cors = require("cors");
 let upload = require("express-fileupload");
 const fs = require("fs");
 const Tesseract = require("tesseract.js");
+const path = require("path");
 
 var app = express();
 app.use(cors());
@@ -10,14 +11,14 @@ app.use(upload());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get("/", (req, res) => {
-  res.send("<h1>OCR</h1>");
+app.use(express.static(path.join(__dirname, "build")));
+
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 const recognize = (imgPath, callback) => {
   const { createWorker } = Tesseract;
-  const path = require("path");
-
   const worker = createWorker({
     langPath: path.join(__dirname, "", "lang-data"),
     // logger: (m) => console.log(m),
