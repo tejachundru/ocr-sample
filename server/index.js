@@ -71,7 +71,7 @@ const appendJsonFile = (text) => {
   );
 };
 
-app.get("/getTextData", function (req, res, next) {
+app.post("/getTextData", function (req, res, next) {
   var fileName = "texts.json";
   res.sendFile(fileName, { root: __dirname + "/img" }, function (err) {
     if (err) {

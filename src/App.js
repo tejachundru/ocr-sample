@@ -4,20 +4,20 @@ import Webcam from "react-webcam";
 import axios from "axios";
 import { Header, Grid, Button, Icon, Message, Loader } from "semantic-ui-react";
 
-const getHostUrl = () => {
-  try {
-    let host = window.location.hostname;
-    let protocol = "";
-    if (host && host.includes("localhost")) {
-      protocol = "http";
-    } else {
-      protocol = "http";
-    }
-    return protocol + "://" + host + ":3001";
-  } catch (e) {
-    throw e;
-  }
-};
+// const getHostUrl = () => {
+//   try {
+//     let host = window.location.hostname;
+//     let protocol = "";
+//     if (host && host.includes("localhost")) {
+//       protocol = "http";
+//     } else {
+//       protocol = "http";
+//     }
+//     return protocol + "://" + host + ":3001";
+//   } catch (e) {
+//     throw e;
+//   }
+// };
 
 function App() {
   const webcamRef = useRef(null);
@@ -28,7 +28,7 @@ function App() {
   const capture = useCallback(() => {
     setLoad(true);
     const imageSrc = webcamRef.current.getScreenshot();
-    let url = `${getHostUrl()}/capture`;
+    let url = `/capture`;
     let config = {
       headers: { "Content-Type": "application/json" }, // x-www-form-urlencoded
     };
@@ -48,7 +48,7 @@ function App() {
 
   const upload = (file) => {
     setLoad(true);
-    let url = `${getHostUrl()}/upload`;
+    let url = `/upload`;
     let formData = new FormData();
     formData.append("file", file);
     let config = {
