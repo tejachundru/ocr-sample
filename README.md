@@ -1,4 +1,6 @@
-# Getting Started with Create React App
+This is a Simple OCR example using the [Tesseract Open Source OCR Engine](https://tesseract-ocr.github.io/)
+
+Upload any image with text , get your text identified with in the image
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
